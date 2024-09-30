@@ -1,5 +1,5 @@
 export interface AvailabilityAttributes {
-  date: string;
-  userID: string;
+  dateYYYYMMDD: string;
+  userID: number;
   hours: number[];
 }

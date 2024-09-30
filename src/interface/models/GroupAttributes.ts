@@ -1,5 +1,5 @@
 export interface GroupAttributes {
-  groupID: string;
+  groupID: number;
   name: string;
-  userIDs: string[];
+  userIDs: number[];
 }

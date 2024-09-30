@@ -1,79 +1,121 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { UserInterface } from "./../interface/UserInterface";
+/* eslint-disable */
+import { CosmosClient, User } from "@azure/cosmos";
 
-export class UserService implements UserInterface {
-  userID: string;
-  name: string;
-  image: string;
-  email?: string;
+enum ContainerName {
+  Users = "Users",
+  Groups = "Groups",
+  Events = "Events",
+  Availability = "Availability",
+}
+class UserService {
+  private cosmosClient: CosmosClient;
+  private database: any;
+  private container: any;
 
-  constructor(userAttributes: UserInterface) {
-    this.userID = userAttributes.userID;
-    this.name = userAttributes.name;
-    this.image = userAttributes.image;
-    this.email = userAttributes.email;
+  constructor(
+    endpoint: string,
+    key: string,
+    databaseName: string,
+    containerName: string
+  ) {
+    this.cosmosClient = new CosmosClient({ endpoint, key });
+    this.database = this.cosmosClient.database(databaseName);
+    this.container = this.database.container(containerName);
+    this.initDatabaseAndContainer();
   }
 
-  async getUser(userID: number): Promise<UserInterface | null> {
-    try {
-      const user = await this.simulateDatabaseCall();
-      return user as UserInterface;
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
+  private async initDatabaseAndContainer() {
+    const { database } = await this.cosmosClient.databases.createIfNotExists({
+      id: this.database.id,
+    });
+    const { container } = await database.containers.createIfNotExists({
+      id: this.container.id,
+    });
   }
 
-  async getUsersByGroupIDs(
-    groupIDs: string[]
-  ): Promise<UserInterface[] | null> {
-    try {
-      const users = await this.simulateDatabaseCall();
-      return users as UserInterface[];
-    } catch (error) {
-      console.error(error);
-      return null;
-    }
+  async getUserById(userID: string) {
+    const query = `SELECT * FROM Users u WHERE u.userID = @userID`;
+    const params = [{ name: "@userID", value: userID }];
+
+    const { resources } = await this.cosmosClient
+      .database(this.database.id)
+      .container(ContainerName.Users)
+      .items.query({ query, parameters: params })
+      .fetchAll();
+    return resources;
   }
 
-  async createUser(userAttributes: UserInterface): Promise<void> {
-    try {
-      await this.simulateDatabaseCall();
-    } catch (error) {
-      console.error(error);
-    }
+  async getUsersByGroupID(groupID: number) {
+    console.log("called groupid", groupID);
+    const query = `SELECT g.userIDs FROM Groups g WHERE g.groupID = @groupID`;
+    const params = [{ name: "@groupID", value: groupID }];
+
+    const { resources } = await this.cosmosClient
+      .database(this.database.id)
+      .container(ContainerName.Groups)
+      .items.query({ query, parameters: params })
+      .fetchAll();
+    return resources;
+  }
+
+  async createUser(name: string) {
+    const user = { name };
+    const { resource } = await this.cosmosClient
+      .database(this.database.id)
+      .container(ContainerName.Users)
+      .items.create(user);
+    return resource;
   }
 
   async updateUser(
     userID: number,
-    userAttributes: UserInterface
-  ): Promise<void> {
-    try {
-      await this.simulateDatabaseCall();
-    } catch (error) {
-      console.error(error);
-    }
+    userName?: string,
+    profileImageUrl?: string,
+    email?: string
+  ) {
+    const user: {
+      id: number;
+      userName?: string;
+      profileImageUrl?: string;
+      email?: string;
+    } = { id: userID };
+    if (userName) user.userName = userName;
+    if (profileImageUrl) user.profileImageUrl = profileImageUrl;
+    if (email) user.email = email;
+
+    const { resource } = await this.cosmosClient
+      .database(this.database.id)
+      .container(ContainerName.Users)
+      .items.upsert(user);
+    return resource;
   }
 
-  async deleteUser(userID: number): Promise<void> {
+  async deleteUser(userID: string) {
     try {
-      await this.simulateDatabaseCall();
-    } catch (error) {
-      console.error(error);
-    }
-  }
+      const query = `SELECT * FROM Users u WHERE u.userID = @userID`;
+      const params = [{ name: "@userID", value: userID }];
+      const { resources } = await this.cosmosClient
+        .database(this.database.id)
+        .container(ContainerName.Users)
+        .items.query({ query, parameters: params })
+        .fetchAll();
 
-  private async simulateDatabaseCall(): Promise<any> {
-    return new Promise((resolve, reject) => {
-      // Simulate a database call
-      setTimeout(() => {
-        resolve({
-          /* some data */
-        });
-      }, 1000);
-    });
+      if (resources.length > 0) {
+        const user = resources[0];
+        const partitionKey = user.userID; // assuming userID is the partition key
+        await this.cosmosClient
+          .database(this.database.id)
+          .container(ContainerName.Users)
+          .item(user.id, partitionKey)
+          .delete();
+        return { message: `User with ID ${userID} deleted successfully` };
+      } else {
+        return { message: `User with ID ${userID} not found` };
+      }
+    } catch (error: any) {
+      throw error;
+    }
   }
 }
+
+export default UserService;

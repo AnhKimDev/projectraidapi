@@ -1,11 +1,11 @@
 export interface EventAttributes {
-  eventID: string;
+  eventID: number;
   title: string;
   description?: string;
-  date: string;
+  dateYYYYMMDD: string;
   startTime: string;
   endTime: string;
   suggestedBy: string;
-  userIDs?: string[];
-  groupIDs?: string[];
+  userIDs?: number[];
+  groupIDs?: number[];
 }

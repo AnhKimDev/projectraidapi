@@ -1,6 +1,6 @@
 export interface UserAttributes {
-  userID: string;
+  userID: number;
   name: string;
-  image: string;
+  profileImageUrl?: string;
   email?: string;
 }
