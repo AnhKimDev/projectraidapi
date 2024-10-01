@@ -4,16 +4,10 @@ import { Router } from "express";
 import { Request, Response } from "express";
 import { ReasonPhrases, StatusCodes } from "http-status-codes";
 import UserService from "./../../services/UserService";
-import * as dotenv from "dotenv";
-dotenv.config({ path: "./.env" });
 
 const UserRouter = Router();
 
-const endpoint = process.env.COSMOSDB_ENDPOINT!;
-const key = process.env.COSMOSDB_KEY!;
-const databaseId = process.env.COSMOS_DB_DATABASE!;
-const containerID = process.env.COSMOS_DB_CONTAINER!;
-const userService = new UserService(endpoint, key, "my-database", "Users");
+const userService = new UserService();
 
 UserRouter.get("/", (req, res) => {
   res.status(200).send("Hello User!");
@@ -54,7 +48,7 @@ UserRouter.post("/createUser", async (req: Request, res: Response) => {
 
 UserRouter.post("/updateUser", async (req: Request, res: Response) => {
   try {
-    const userID: number = req.body.name;
+    const userID: string = req.body.name;
     const userName: string = req.body.userName;
     const profileImageUrl: string = req.body.profileImageUrl;
     const email: string = req.body.email;
