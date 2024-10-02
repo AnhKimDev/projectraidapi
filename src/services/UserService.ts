@@ -29,7 +29,7 @@ class UserService {
     }
   }
 
-  async getUsersByGroupID(groupID: number) {
+  async getUsersByGroupID(groupID: string) {
     const query = `SELECT g.userIDs FROM Groups g WHERE g.groupID = @groupID`;
     const params = [{ name: "@groupID", value: groupID }];
 

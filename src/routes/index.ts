@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Router } from "express";
 import UserRouter from "./user";
 import GroupRouter from "./group";

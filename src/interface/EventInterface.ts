@@ -25,11 +25,11 @@ export interface EventInterface {
   ): Promise<void>;
   updateEvent(
     eventID: string,
-    title: string,
-    date: string,
-    startTime: string,
-    endTime: string,
     suggestedBy: string,
+    title?: string,
+    date?: string,
+    startTime?: string,
+    endTime?: string,
     userIDs?: string[],
     groupIDs?: string[],
     description?: string
