@@ -8,19 +8,19 @@ export interface AvailabilityInterface {
   getAvailabilityByUser(
     userID: string,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
   ): Promise<Availability[]>;
   getAvailabilityByGroup(groupID: number, date: Date): Promise<Availability[]>;
   updateAvailabilityByUser(
     userID: string,
     startDate: Date,
     endDate: Date,
-    hours: number[]
+    hours: number[],
   ): Promise<void>;
   updateAvailabilityByGroup(
     dateIso: string,
     startDate: Date,
     endDate: Date,
-    usersAvailability: number[]
+    usersAvailability: number[],
   ): Promise<void>;
 }

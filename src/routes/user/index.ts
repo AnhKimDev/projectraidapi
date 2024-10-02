@@ -17,7 +17,7 @@ UserRouter.get("/getUserById", async (req: Request, res: Response) => {
     res.status(200).json(user);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error retrieving users" });
+    res.status(500).json({ message: "Error getUserById" });
   }
 });
 
@@ -28,7 +28,7 @@ UserRouter.get("/getUsersByGroupID", async (req: Request, res: Response) => {
     res.status(200).json(users);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error retrieving users" });
+    res.status(500).json({ message: "Error getUsersByGroupID" });
   }
 });
 
@@ -39,7 +39,7 @@ UserRouter.post("/createUser", async (req: Request, res: Response) => {
     res.status(200).json(user);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error retrieving users" });
+    res.status(500).json({ message: "Error createUser" });
   }
 });
 
@@ -61,7 +61,7 @@ UserRouter.post("/updateUser", async (req: Request, res: Response) => {
     res.status(200).json(user);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error retrieving users" });
+    res.status(500).json({ message: "Error updateUser" });
   }
 });
 
@@ -72,7 +72,7 @@ UserRouter.delete("/deleteUser", async (req: Request, res: Response) => {
     res.status(200).json(user);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error retrieving users" });
+    res.status(500).json({ message: "Error deleteUser" });
   }
 });
 

@@ -22,7 +22,7 @@ AvailabilityRouter.get(
       const user = await availabilityService.getAvailabilityByUser(
         userID,
         startDate,
-        endDate
+        endDate,
       );
       res.status(200).json(user);
     } catch (error) {
@@ -31,7 +31,7 @@ AvailabilityRouter.get(
         .status(500)
         .json({ message: "Error retrieving getAvailabilityByUser" });
     }
-  }
+  },
 );
 
 AvailabilityRouter.get(
@@ -41,7 +41,7 @@ AvailabilityRouter.get(
       const { groupID, date } = req.body as { groupID: string; date: string };
       const user = await availabilityService.getAvailabilityByGroup(
         groupID,
-        date
+        date,
       );
       res.status(200).json(user);
     } catch (error) {
@@ -50,7 +50,7 @@ AvailabilityRouter.get(
         .status(500)
         .json({ message: "Error retrieving getAvailabilityByGroup" });
     }
-  }
+  },
 );
 
 AvailabilityRouter.post(
@@ -70,7 +70,7 @@ AvailabilityRouter.post(
         .status(500)
         .json({ message: "Error retrieving updateAvailabilityByUser" });
     }
-  }
+  },
 );
 
 AvailabilityRouter.post(
@@ -94,7 +94,7 @@ AvailabilityRouter.post(
         .status(500)
         .json({ message: "Error retrieving updateAvailabilityByGroup" });
     }
-  }
+  },
 );
 
 export default AvailabilityRouter;

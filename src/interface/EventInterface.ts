@@ -21,7 +21,7 @@ export interface EventInterface {
     suggestedBy: string,
     userIDs?: string[],
     groupIDs?: string[],
-    description?: string
+    description?: string,
   ): Promise<void>;
   updateEvent(
     eventID: string,
@@ -32,7 +32,7 @@ export interface EventInterface {
     endTime?: string,
     userIDs?: string[],
     groupIDs?: string[],
-    description?: string
+    description?: string,
   ): Promise<void>;
   deleteEvent(eventID: string): Promise<void>;
 }

@@ -28,7 +28,7 @@ class CosmosService {
   public static getInstance(
     endpoint: string,
     key: string,
-    databaseName: string
+    databaseName: string,
   ): CosmosService {
     if (!CosmosService.instance) {
       CosmosService.instance = new CosmosService(endpoint, key, databaseName);

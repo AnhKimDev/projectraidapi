@@ -49,7 +49,7 @@ class EventService {
     suggestedBy: string,
     userIDs?: string[],
     groupIDs?: string[],
-    description?: string
+    description?: string,
   ) {
     try {
       const event = {
@@ -82,7 +82,7 @@ class EventService {
     endTime?: string,
     userIDs?: string[],
     groupIDs?: string[],
-    description?: string
+    description?: string,
   ) {
     try {
       // Fetch the existing Event

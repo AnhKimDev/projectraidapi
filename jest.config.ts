@@ -2,6 +2,7 @@ import type { Config } from "@jest/types";
 
 const config: Config.InitialOptions = {
   preset: "ts-jest",
+  testEnvironment: "node",
   transform: {
     "^.+\\.(ts|tsx)?$": "ts-jest",
   },
@@ -9,7 +10,7 @@ const config: Config.InitialOptions = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
-  roots: ["<rootDir>/src"],
+  testMatch: ["**/*.test.ts", "**/*.test.tsx"],
   collectCoverage: true,
   coverageReporters: ["json", "lcov", "clover"],
 };

@@ -14,6 +14,10 @@ class UserService {
 
   async getUserById(userID: string) {
     try {
+      if (!userID) {
+        throw new Error("User  ID is required");
+      }
+
       const query = `SELECT * FROM Users u WHERE u.userID = @userID`;
       const params = [{ name: "@userID", value: userID }];
 
@@ -22,10 +26,18 @@ class UserService {
         .container(ContainerName.Users)
         .items.query({ query, parameters: params })
         .fetchAll();
-      return resources;
-    } catch (error) {
+
+      if (!resources || resources.length === 0) {
+        throw new Error(`User  with ID ${userID} not found`);
+      }
+
+      return resources[0];
+    } catch (error: any) {
       console.error(`Error in getUserById: ${error}`);
-      throw error;
+      throw {
+        status: 404,
+        message: error.message,
+      };
     }
   }
 

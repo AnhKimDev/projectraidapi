@@ -60,7 +60,7 @@ EventRouter.post("/createEvent", async (req: Request, res: Response) => {
       suggestedBy,
       userIDs,
       groupIDs,
-      description
+      description,
     );
     res.status(200).json(event);
   } catch (error) {
@@ -103,7 +103,7 @@ EventRouter.post("/updateEvent", async (req: Request, res: Response) => {
 
       userIDs,
       groupIDs,
-      description
+      description,
     );
     res.status(200).json(user);
   } catch (error) {

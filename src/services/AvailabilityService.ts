@@ -15,7 +15,7 @@ class AvailabilityService {
   async getAvailabilityByUser(
     userID: string,
     startDate: string,
-    endDate: string
+    endDate: string,
   ) {
     try {
       const query = `SELECT * FROM Availability a WHERE a.userID = @userID AND a.date >= @startDate AND a.date <= @endDate`;
@@ -66,7 +66,7 @@ class AvailabilityService {
   }
 
   async updateAvailabilityByUser(
-    availabilityData: { userID: string; date: string; hours: number[] }[]
+    availabilityData: { userID: string; date: string; hours: number[] }[],
   ): Promise<void> {
     try {
       // Perform a single bulk upsert operation on the database
@@ -86,7 +86,7 @@ class AvailabilityService {
       userID: string;
       date: string;
       hours: number[];
-    }[]
+    }[],
   ): Promise<void> {
     try {
       const container = this.client
@@ -97,11 +97,11 @@ class AvailabilityService {
         availabilityData.map((item) => ({
           operationType: "Upsert",
           resourceBody: item,
-        }))
+        })),
       );
 
       console.log(
-        `Successfully updated availability for ${availabilityData.length} entries.`
+        `Successfully updated availability for ${availabilityData.length} entries.`,
       );
     } catch (error) {
       console.error(`Error in updateAvailabilityByGroup: ${error}`);
