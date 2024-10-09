@@ -30,7 +30,7 @@ class GroupService {
   }
 
   async getGroupsByUserID(userID: string) {
-    const query = `SELECT g.userIDs FROM Groups g WHERE @userID IN g.userID`;
+    const query = `SELECT * FROM Groups g WHERE ARRAY_CONTAINS(g.userIDs, @userID)`;
     const params = [{ name: "@userID", value: userID }];
 
     const { resources } = await this.client
@@ -39,6 +39,30 @@ class GroupService {
       .items.query({ query, parameters: params })
       .fetchAll();
     return resources;
+  }
+
+  async getUsersByGroupIDs(groupIDs: string[]) {
+    const userIDs: string[] = [];
+
+    for (const groupID of groupIDs) {
+      const query = `SELECT g.userIDs FROM Groups g WHERE g.groupID = @groupID`;
+      const params = [{ name: "@groupID", value: groupID }];
+      //console.log("trying getUsersByGroupIDs with query params", query, params);
+
+      const { resources } = await this.client
+        .database(this.database.id)
+        .container(ContainerName.Groups)
+        .items.query({ query, parameters: params })
+        .fetchAll();
+      //console.log("response:", resources);
+
+      if (resources.length > 0) {
+        const groupUserIDs = resources[0].userIDs;
+        userIDs.push(...groupUserIDs);
+      }
+    }
+
+    return userIDs;
   }
 
   async createGroup(name: string) {

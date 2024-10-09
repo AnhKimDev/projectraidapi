@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { cosmosInstance } from "./CosmosInstance";
 import { ContainerName } from "./cosmosService";
-import { CosmosClient } from "@azure/cosmos";
+import { BulkOperationType, CosmosClient } from "@azure/cosmos";
 
 class AvailabilityService {
   private client: CosmosClient;
@@ -15,7 +15,7 @@ class AvailabilityService {
   async getAvailabilityByUser(
     userID: string,
     startDate: string,
-    endDate: string,
+    endDate: string
   ) {
     try {
       const query = `SELECT * FROM Availability a WHERE a.userID = @userID AND a.date >= @startDate AND a.date <= @endDate`;
@@ -66,16 +66,84 @@ class AvailabilityService {
   }
 
   async updateAvailabilityByUser(
-    availabilityData: { userID: string; date: string; hours: number[] }[],
+    availabilityData: {
+      id: string;
+      userID: string;
+      date: string;
+      hours: number[];
+    }[]
   ): Promise<void> {
     try {
-      // Perform a single bulk upsert operation on the database
+      const bulkOperations = availabilityData.map((entry) => ({
+        operationType: BulkOperationType.Upsert,
+        id: entry.id,
+        resourceBody: {
+          id: entry.id,
+          userID: entry.userID,
+          date: entry.date,
+          hours: entry.hours,
+        },
+      }));
+
       await this.client
         .database(this.database.id)
         .container(ContainerName.Availability)
-        .items.upsert(availabilityData);
+        .items.bulk(bulkOperations);
     } catch (error) {
-      console.error(`Error in updateAvailabilityBy:User  ${error}`);
+      console.error(`Error in updateAvailabilityByUser: ${error}`);
+      throw error;
+    }
+  }
+
+  async addAvailabilityByUser(
+    availabilityData: { userID: string; date: string; hours: number[] }[]
+  ): Promise<void> {
+    try {
+      // Create an array of OperationInput objects
+      const bulkOperations = availabilityData.map((entry) => ({
+        operationType: BulkOperationType.Upsert,
+        resourceBody: {
+          userID: entry.userID,
+          date: entry.date,
+          hours: entry.hours,
+        },
+      }));
+
+      // Perform a single bulk create operation on the database
+      await this.client
+        .database(this.database.id)
+        .container(ContainerName.Availability)
+        .items.bulk(bulkOperations);
+    } catch (error) {
+      console.error(`Error in addAvailabilityByUser: ${error}`);
+      throw error;
+    }
+  }
+
+  async removeAvailabilityByUser(
+    availabilityData: { userID: string; date: string; hours: number[] }[]
+  ): Promise<void> {
+    try {
+      // Loop through each item in the availabilityData array
+      for (const item of availabilityData) {
+        // Check if an existing entry exists in the database
+        const existingItem = await this.client
+          .database(this.database.id)
+          .container(ContainerName.Availability)
+          .item(item.userID, item.date)
+          .read();
+
+        if (existingItem.resource) {
+          // If an existing entry exists, delete it
+          await this.client
+            .database(this.database.id)
+            .container(ContainerName.Availability)
+            .item(item.userID, item.date)
+            .delete();
+        }
+      }
+    } catch (error) {
+      console.error(`Error in removeAvailabilityBy:User  ${error}`);
       throw error;
     }
   }
@@ -86,7 +154,7 @@ class AvailabilityService {
       userID: string;
       date: string;
       hours: number[];
-    }[],
+    }[]
   ): Promise<void> {
     try {
       const container = this.client
@@ -97,11 +165,11 @@ class AvailabilityService {
         availabilityData.map((item) => ({
           operationType: "Upsert",
           resourceBody: item,
-        })),
+        }))
       );
 
       console.log(
-        `Successfully updated availability for ${availabilityData.length} entries.`,
+        `Successfully updated availability for ${availabilityData.length} entries.`
       );
     } catch (error) {
       console.error(`Error in updateAvailabilityByGroup: ${error}`);

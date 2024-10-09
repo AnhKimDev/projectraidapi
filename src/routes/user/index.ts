@@ -10,11 +10,11 @@ UserRouter.get("/", (req, res) => {
   res.status(200).send("Hello User!");
 });
 
-UserRouter.get("/getUserById", async (req: Request, res: Response) => {
+UserRouter.post("/getUserByUserID", async (req: Request, res: Response) => {
   try {
     const { userID } = req.body as { userID: string };
-    const user = await userService.getUserById(userID);
-    res.status(200).json(user);
+    console.log("req: getUserByUserID", userID);
+    res.status(200).json(await userService.getUserByUserID(userID));
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error getUserById" });

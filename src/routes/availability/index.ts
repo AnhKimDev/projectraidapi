@@ -10,7 +10,7 @@ AvailabilityRouter.get("/", (req, res) => {
   res.status(200).send("Hello Availability!");
 });
 
-AvailabilityRouter.get(
+AvailabilityRouter.post(
   "/getAvailabilityByUser",
   async (req: Request, res: Response) => {
     try {
@@ -19,11 +19,18 @@ AvailabilityRouter.get(
         startDate: string;
         endDate: string;
       };
+      console.log(
+        "req: getAvailabilityByUser with",
+        userID,
+        startDate,
+        endDate
+      );
       const user = await availabilityService.getAvailabilityByUser(
         userID,
         startDate,
-        endDate,
+        endDate
       );
+      //console.log("res: getAvailabilityByUser with", user);
       res.status(200).json(user);
     } catch (error) {
       console.error(error);
@@ -31,7 +38,7 @@ AvailabilityRouter.get(
         .status(500)
         .json({ message: "Error retrieving getAvailabilityByUser" });
     }
-  },
+  }
 );
 
 AvailabilityRouter.get(
@@ -41,7 +48,7 @@ AvailabilityRouter.get(
       const { groupID, date } = req.body as { groupID: string; date: string };
       const user = await availabilityService.getAvailabilityByGroup(
         groupID,
-        date,
+        date
       );
       res.status(200).json(user);
     } catch (error) {
@@ -50,7 +57,7 @@ AvailabilityRouter.get(
         .status(500)
         .json({ message: "Error retrieving getAvailabilityByGroup" });
     }
-  },
+  }
 );
 
 AvailabilityRouter.post(
@@ -58,9 +65,14 @@ AvailabilityRouter.post(
   async (req: Request, res: Response) => {
     try {
       const { availabilityData } = req.body as {
-        userID: string;
-        availabilityData: { userID: string; date: string; hours: number[] }[];
+        availabilityData: {
+          id: string;
+          userID: string;
+          date: string;
+          hours: number[];
+        }[];
       };
+      console.log("req: updateAvailabilityByUser with", availabilityData);
       const user =
         await availabilityService.updateAvailabilityByUser(availabilityData);
       res.status(200).json(user);
@@ -70,7 +82,55 @@ AvailabilityRouter.post(
         .status(500)
         .json({ message: "Error retrieving updateAvailabilityByUser" });
     }
-  },
+  }
+);
+
+AvailabilityRouter.post(
+  "/addAvailabilityByUser",
+  async (req: Request, res: Response) => {
+    try {
+      const { availabilityData } = req.body as {
+        availabilityData: {
+          userID: string;
+          date: string;
+          hours: number[];
+        }[];
+      };
+      console.log("req: addAvailabilityByUser with", availabilityData);
+      res
+        .status(200)
+        .json(
+          await availabilityService.addAvailabilityByUser(availabilityData)
+        );
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .json({ message: "Error retrieving updateAvailabilityByUser" });
+    }
+  }
+);
+
+AvailabilityRouter.post(
+  "/removeAvailabilityByUser",
+  async (req: Request, res: Response) => {
+    try {
+      const { availabilityData } = req.body as {
+        availabilityData: { userID: string; date: string; hours: number[] }[];
+      };
+      console.log("req: removeAvailabilityByUser with", availabilityData);
+      res
+        .status(200)
+        .json(
+          await availabilityService.removeAvailabilityByUser(availabilityData)
+        );
+    } catch (error) {
+      console.error(error);
+      res
+        .status(500)
+        .json({ message: "Error retrieving updateAvailabilityByUser" });
+    }
+  }
 );
 
 AvailabilityRouter.post(
@@ -94,7 +154,7 @@ AvailabilityRouter.post(
         .status(500)
         .json({ message: "Error retrieving updateAvailabilityByGroup" });
     }
-  },
+  }
 );
 
 export default AvailabilityRouter;

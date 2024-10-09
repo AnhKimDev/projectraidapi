@@ -9,7 +9,7 @@ EventRouter.get("/", (req, res) => {
   res.status(200).send("Hello Event!");
 });
 
-EventRouter.get("/getEventByEventID", async (req: Request, res: Response) => {
+EventRouter.post("/getEventByEventID", async (req: Request, res: Response) => {
   try {
     const { eventID } = req.body as { eventID: string };
     const event = await eventService.getEventByEventID(eventID);
@@ -20,9 +20,10 @@ EventRouter.get("/getEventByEventID", async (req: Request, res: Response) => {
   }
 });
 
-EventRouter.get("/getEventsByUserID", async (req: Request, res: Response) => {
+EventRouter.post("/getEventsByUserID", async (req: Request, res: Response) => {
   try {
     const { userID } = req.body as { userID: string };
+    console.log("req: getEventsByUserID with ", userID);
     const events = await eventService.getEventsByUserID(userID);
     res.status(200).json(events);
   } catch (error) {
@@ -60,7 +61,7 @@ EventRouter.post("/createEvent", async (req: Request, res: Response) => {
       suggestedBy,
       userIDs,
       groupIDs,
-      description,
+      description
     );
     res.status(200).json(event);
   } catch (error) {
@@ -103,7 +104,7 @@ EventRouter.post("/updateEvent", async (req: Request, res: Response) => {
 
       userIDs,
       groupIDs,
-      description,
+      description
     );
     res.status(200).json(user);
   } catch (error) {

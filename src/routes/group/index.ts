@@ -10,7 +10,7 @@ GroupRouter.get("/", (req, res) => {
   res.status(200).send("Hello Group!");
 });
 
-GroupRouter.get("/getGroupById", async (req: Request, res: Response) => {
+GroupRouter.post("/getGroupById", async (req: Request, res: Response) => {
   try {
     const { groupID } = req.body as { groupID: string };
     const user = await groupService.getGroupById(groupID);
@@ -21,10 +21,22 @@ GroupRouter.get("/getGroupById", async (req: Request, res: Response) => {
   }
 });
 
-GroupRouter.get("/getGroupsByUserID", async (req: Request, res: Response) => {
+GroupRouter.post("/getGroupsByUserID", async (req: Request, res: Response) => {
   try {
     const { userID } = req.body as { userID: string };
     const users = await groupService.getGroupsByUserID(userID);
+    res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error getGroupsByUserID" });
+  }
+});
+
+GroupRouter.post("/getUsersByGroupIDs", async (req: Request, res: Response) => {
+  try {
+    const { groupIDs } = req.body as { groupIDs: string[] };
+    console.log("req: getUsersByGroupIDs", groupIDs);
+    const users = await groupService.getUsersByGroupIDs(groupIDs);
     res.status(200).json(users);
   } catch (error) {
     console.error(error);

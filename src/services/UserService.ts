@@ -12,7 +12,7 @@ class UserService {
     this.database = cosmosInstance.getDatabase();
   }
 
-  async getUserById(userID: string) {
+  async getUserByUserID(userID: string) {
     try {
       if (!userID) {
         throw new Error("User  ID is required");
@@ -75,7 +75,7 @@ class UserService {
   ) {
     try {
       // Fetch the existing user
-      const existingUsers = await this.getUserById(userID);
+      const existingUsers = await this.getUserByUserID(userID);
 
       if (existingUsers.length === 0) {
         throw new Error(`User with ID ${userID} not found`);

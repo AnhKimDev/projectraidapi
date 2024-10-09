@@ -30,9 +30,8 @@ class EventService {
   }
 
   async getEventsByUserID(userID: string) {
-    const query = `SELECT * FROM Events e WHERE @userID IN e.userIDs`;
+    const query = `SELECT * FROM Events e WHERE ARRAY_CONTAINS(e.userIDs, @userID)`;
     const params = [{ name: "@userID", value: userID }];
-
     const { resources } = await this.client
       .database(this.database.id)
       .container(ContainerName.Events)
@@ -49,7 +48,7 @@ class EventService {
     suggestedBy: string,
     userIDs?: string[],
     groupIDs?: string[],
-    description?: string,
+    description?: string
   ) {
     try {
       const event = {
@@ -82,7 +81,7 @@ class EventService {
     endTime?: string,
     userIDs?: string[],
     groupIDs?: string[],
-    description?: string,
+    description?: string
   ) {
     try {
       // Fetch the existing Event
