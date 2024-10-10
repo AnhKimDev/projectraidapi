@@ -41,11 +41,12 @@ AvailabilityRouter.post(
   }
 );
 
-AvailabilityRouter.get(
+AvailabilityRouter.post(
   "/getAvailabilityByGroup",
   async (req: Request, res: Response) => {
     try {
       const { groupID, date } = req.body as { groupID: string; date: string };
+      console.log("req: getAvailabilityByGroup ", groupID, date);
       const user = await availabilityService.getAvailabilityByGroup(
         groupID,
         date

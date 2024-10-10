@@ -39,26 +39,61 @@ class AvailabilityService {
 
   async getAvailabilityByGroup(groupID: string, date: string) {
     try {
-      const query1 = `SELECT g.userIDs FROM Groups g WHERE g.groupID = @groupID`;
-      const params1 = [{ name: "@groupID", value: groupID }];
+      const query = `SELECT g.userIDs FROM Groups g WHERE g.groupID = @groupID`;
+      const params = [{ name: "@groupID", value: groupID }];
 
       const { resources: groupResources } = await this.client
         .database(this.database.id)
         .container(ContainerName.Groups)
-        .items.query({ query: query1, parameters: params1 })
+        .items.query({ query, parameters: params })
         .fetchAll();
+
+      if (groupResources.length === 0) {
+        throw new Error("Group not found");
+      }
 
       const userIDs = groupResources[0].userIDs;
+      console.log("getAvailabilityByGroup: userIDs", userIDs);
+      let availabilityData: Array<{
+        userID: string;
+        date: string;
+        hours: number[];
+      }> = [];
 
-      const query2 = `SELECT * FROM Availability a WHERE a.userID IN (${userIDs.map((id: any) => `'${id}'`).join(",")}) AND a.date = @date`;
-      const params2 = [{ name: "@date", value: date }];
+      for (const userID of userIDs) {
+        if (!userID) {
+          continue; // Skip if userID is empty
+        }
 
-      const { resources: availabilityResources } = await this.client
-        .database(this.database.id)
-        .container(ContainerName.Availability)
-        .items.query({ query: query2, parameters: params2 })
-        .fetchAll();
-      return availabilityResources;
+        const query = `SELECT * FROM Availability a WHERE a.userID = @userID AND a.date = @date`;
+        const params = [
+          { name: "@userID", value: userID },
+          { name: "@date", value: date },
+        ];
+
+        const { resources } = await this.client
+          .database(this.database.id)
+          .container(ContainerName.Availability)
+          .items.query({ query, parameters: params })
+          .fetchAll();
+
+        console.log("getAvailabilityByGroup:", userID, resources);
+
+        if (resources.length > 0) {
+          const userhours = resources[0].hours;
+
+          if (userhours) {
+            console.log("getAvailabilityByGroup: pushing", userhours);
+            availabilityData.push({
+              userID: userID,
+              date: date,
+              hours: userhours,
+            });
+          }
+        }
+      }
+      console.log(availabilityData);
+      return availabilityData;
     } catch (error) {
       console.error(`Error in getAvailabilityByGroup: ${error}`);
       throw error;
